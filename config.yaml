@@ -1,0 +1,9 @@
+server:
+  port: 8008
+
+database:
+  hostname: localhost
+  port: 3306
+  username: root
+  password: zxs123456789
+  name: wpm
