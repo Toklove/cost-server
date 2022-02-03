@@ -39,6 +39,7 @@ func GetBill(c *fiber.Ctx) error {
 	defaultList := BillService.GetAllBill(int(uid))
 	var list []BillModel.Bill
 	start, end := timeUtils.GetMonthStartEnd(listItem.Date)
+	totalExpense, totalIncome := 0, 0
 	if listItem.Date != "" {
 		for _, v := range defaultList {
 			if v.Date > start && v.Date < end {
@@ -48,7 +49,6 @@ func GetBill(c *fiber.Ctx) error {
 	} else {
 		list = defaultList
 	}
-	totalExpense, totalIncome := 0, 0
 	if listItem.PageSize != 0 && listItem.Page != 0 {
 		sliceStart, sliceEnd := page.SlicePage(listItem.Page, listItem.PageSize, len(list))
 		list = list[sliceStart:sliceEnd]
@@ -56,12 +56,6 @@ func GetBill(c *fiber.Ctx) error {
 	var resList []BillModel.SelectList
 	hasMap := make(map[string]string) //通过hash map控制防止重复
 	for _, v := range list {
-		r, _ := strconv.Atoi(v.Amount)
-		if v.PayType == 1 {
-			totalExpense += r
-		} else {
-			totalIncome += r
-		}
 		var showList []BillModel.Bill
 		date := timeUtils.GetDate(v.Date)
 		if hasMap[date] == date {
@@ -71,6 +65,12 @@ func GetBill(c *fiber.Ctx) error {
 			for _, v := range list {
 				if timeUtils.GetDate(v.Date) == date {
 					showList = append(showList, v)
+					r, _ := strconv.Atoi(v.Amount)
+					if v.PayType == 1 {
+						totalExpense += r
+					} else {
+						totalIncome += r
+					}
 				}
 			}
 		} else {
@@ -80,6 +80,12 @@ func GetBill(c *fiber.Ctx) error {
 			for _, v := range list {
 				if timeUtils.GetDate(v.Date) == date && v.TypeId == listItem.TypeId {
 					showList = append(showList, v)
+					r, _ := strconv.Atoi(v.Amount)
+					if v.PayType == 1 {
+						totalExpense += r
+					} else {
+						totalIncome += r
+					}
 				}
 			}
 
