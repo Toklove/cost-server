@@ -6,9 +6,9 @@ import (
 	BillService "fiber/application/service/Bill"
 	"fiber/application/utils/decode"
 	"fiber/application/utils/page"
+	timeUtils "fiber/application/utils/time"
 	"github.com/gofiber/fiber/v2"
 	"strconv"
-	"time"
 )
 
 func AddBill(c *fiber.Ctx) error {
@@ -36,50 +36,56 @@ func GetBill(c *fiber.Ctx) error {
 		return err
 	}
 	uid := decode.UId(c)
-	list := BillService.GetAllBill(int(uid))
+	defaultList := BillService.GetAllBill(int(uid))
+	var list []BillModel.Bill
+	start, end := timeUtils.GetMonthStartEnd(listItem.Date)
+	if listItem.Date != "" {
+		for _, v := range defaultList {
+			if v.Date > start && v.Date < end {
+				list = append(list, v)
+			}
+		}
+	} else {
+		list = defaultList
+	}
 	totalExpense, totalIncome := 0, 0
 	if listItem.PageSize != 0 && listItem.Page != 0 {
 		sliceStart, sliceEnd := page.SlicePage(listItem.Page, listItem.PageSize, len(list))
 		list = list[sliceStart:sliceEnd]
 	}
 	var resList []BillModel.SelectList
-	hasMap := make(map[string]string)
-	if listItem.TypeId == "all" {
-		for _, v := range list {
-			r, _ := strconv.Atoi(v.Amount)
-			if v.PayType == 1 {
-				totalExpense += r
-			} else {
-				totalIncome += r
-			}
-			var showList []BillModel.Bill
-			date := time.Unix(v.Date, 0).Format("2006-01-02")
-			if hasMap[date] == date {
-				continue
-			}
+	hasMap := make(map[string]string) //通过hash map控制防止重复
+	for _, v := range list {
+		r, _ := strconv.Atoi(v.Amount)
+		if v.PayType == 1 {
+			totalExpense += r
+		} else {
+			totalIncome += r
+		}
+		var showList []BillModel.Bill
+		date := timeUtils.GetDate(v.Date)
+		if hasMap[date] == date {
+			continue
+		}
+		if listItem.TypeId == "all" {
 			for _, v := range list {
-				if time.Unix(v.Date, 0).Format("2006-01-02") == date {
+				if timeUtils.GetDate(v.Date) == date {
 					showList = append(showList, v)
 				}
 			}
-			resList = append(resList, BillModel.SelectList{Date: date, Bills: showList})
-			hasMap[date] = date
-		}
-	} else {
-		for _, v := range list {
-			var showList []BillModel.Bill
-			date := time.Unix(v.Date, 0).Format("2006-01-02")
-			if hasMap[date] == date || v.TypeId != listItem.TypeId {
+		} else {
+			if v.TypeId != listItem.TypeId {
 				continue
 			}
 			for _, v := range list {
-				if time.Unix(v.Date, 0).Format("2006-01-02") == date && v.TypeId == listItem.TypeId {
+				if timeUtils.GetDate(v.Date) == date && v.TypeId == listItem.TypeId {
 					showList = append(showList, v)
 				}
 			}
-			resList = append(resList, BillModel.SelectList{Date: date, Bills: showList})
-			hasMap[date] = date
+
 		}
+		resList = append(resList, BillModel.SelectList{Date: date, Bills: showList})
+		hasMap[date] = date
 	}
 	return result.Success("获取成功", &fiber.Map{
 		"total_expense": totalExpense,

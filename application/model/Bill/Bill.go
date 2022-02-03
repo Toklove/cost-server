@@ -1,7 +1,5 @@
 package BillModel
 
-import "time"
-
 type Bill struct {
 	Id       int    `json:"id" gorm:"primaryKey"`
 	PayType  int    `json:"pay_type" form:"pay_type"`
@@ -13,10 +11,10 @@ type Bill struct {
 	Remark   string `json:"remark" form:"remark"`
 }
 type List struct {
-	Date     time.Time `json:"date" query:"date"`
-	Page     int       `json:"page" query:"page"`
-	PageSize int       `json:"page_size" query:"page_size"`
-	TypeId   string    `json:"type_id" query:"type_id"`
+	Date     string `json:"date" query:"date"`
+	Page     int    `json:"page" query:"page"`
+	PageSize int    `json:"page_size" query:"page_size"`
+	TypeId   string `json:"type_id" query:"type_id"`
 }
 
 type SelectList struct {

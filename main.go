@@ -20,6 +20,5 @@ func main() {
 	router.BeforeRouter()   //加载前置路由
 	middleware.Middleware() //加载中间件
 	router.AfterRouter()    //加载后置路由
-
 	log.Fatal(app.Listen(fmt.Sprintf(":%v", profile.Profile.Server.Port)))
 }
