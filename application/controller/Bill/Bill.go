@@ -139,9 +139,9 @@ func RemoveBillDetail(c *fiber.Ctx) error {
 	}
 }
 func GetEchartsData(c *fiber.Ctx) error {
-	dataTime := new(BillModel.Data)
-	err := c.BodyParser(dataTime)
-	if err != nil {
+	date := new(BillModel.Data)
+
+	if err := c.QueryParser(date); err != nil {
 		return err
 	}
 	var resultList []BillModel.Bill
@@ -149,10 +149,10 @@ func GetEchartsData(c *fiber.Ctx) error {
 	hasMap := make(map[BillModel.DataItem]BillModel.DataItem)
 	list := BillService.GetAllBill(int(decode.UId(c)))
 	totalExpense, totalIncome := 0, 0
+	start, end := timeUtils.GetMonthStartEnd(date.Date)
 	//筛选出时间范围内的数据
 	for _, v := range list {
-		data := int(v.Date)
-		if dataTime.Start <= data && data <= dataTime.End {
+		if start <= v.Date && v.Date <= end {
 			resultList = append(resultList, v)
 		}
 	}

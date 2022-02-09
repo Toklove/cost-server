@@ -23,8 +23,7 @@ type SelectList struct {
 }
 
 type Data struct {
-	Start int `json:"start" form:"start"`
-	End   int `json:"end" form:"end"`
+	Date string `json:"date" form:"date"`
 }
 type DataItem struct {
 	Number   int    `json:"number"`

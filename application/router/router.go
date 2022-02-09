@@ -24,7 +24,7 @@ func AfterRouter() {
 	api.Post("/upload", upload.UpImg)
 	api.Post("/bill", bill.AddBill)
 	api.Get("/bill", bill.GetBill)
-	api.Post("/bill/data", bill.GetEchartsData)
+	api.Get("/bill/data", bill.GetEchartsData)
 	api.Get("/bill/:id", bill.GetBillDetail)
 	api.Put("/bill/:id", bill.UpdateBillDetail)
 	api.Delete("/bill/:id", bill.RemoveBillDetail)
