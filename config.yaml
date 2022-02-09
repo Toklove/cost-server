@@ -2,8 +2,8 @@ server:
   port: 8008
 
 database:
-  hostname: localhost
+  hostname: rm-7xv40h6k44012o921lo.mysql.rds.aliyuncs.com
   port: 3306
-  username: root
-  password: zxs123456789
-  name: wpm
+  username: toklove
+  password: XMxm123456++
+  name: testdev
